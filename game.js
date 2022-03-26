@@ -27,7 +27,13 @@ flight.init = function () {
     flight.renderer.setSize(window.innerWidth, window.innerHeight);
     document.body.appendChild(flight.renderer.domElement);
 
-    // loadModels();
+    //collision
+    flight.raycaster = new THREE.Raycaster();
+    flight.pointer = new THREE.Vector2();
+    flight.pointer.x = 1;
+    flight.pointer.y = 1;
+
+    loadModels();
     createEnvir();
     controlSetUp();
     lightingSetUp();
@@ -44,6 +50,32 @@ function animate() {
 
 function render() {
     const delta = flight.clock.getDelta();
+
+    //https://threejs.org/docs/index.html?q=ray#api/en/core/Raycaster
+    // update the picking ray with the camera and pointer position
+    flight.raycaster.setFromCamera(flight.pointer, flight.camera);
+
+    // calculate objects intersecting the picking ray
+    const intersects = flight.raycaster.intersectObjects(flight.scene.children);
+    console.log(intersects);
+
+    console.log(flight.scene.children);
+
+    console.log(flight.scene.children[0]);
+
+    for (let i = 0; i < flight.scene.children.length; i++) {
+        if (flight.scene.children[i].isMesh) {
+            flight.scene.children[i].material.color.set(0xffffff);
+        }
+    }
+
+    for (let i = 0; i < intersects.length; i++) {
+
+        intersects[i].object.material.color.set(0xff0000);
+
+    }
+
+
     flight.controls.update(delta);
 }
 
@@ -74,8 +106,8 @@ function controlSetUp() {
     // Forces the camera/ controls forward, similar to a normal flight sim
     flight.controls.autoForward = true;
     // I will include the movement speed and the roll speed, but set to the default just to show what work is being done
-    flight.controls.movementSpeed = 1;
-    flight.controls.rollSpeed = 0.5;
+    flight.controls.movementSpeed = 50;
+    flight.controls.rollSpeed = 0.75;
     // controls.rollSpeed = Math.PI / 24;
     flight.controls.domElement = flight.renderer.domElement;
 
@@ -111,15 +143,15 @@ function loadModels() {
 
     // instantiate a loader
 
-    
+
     const loader = new GLTFLoader();
-    
+
     loader.load(
         // resource URL
         'models/PlaneLeftDown.glb',
         // called when the resource is loaded
-        function ( gltf ) {
-            
+        function (gltf) {
+
             gltf.scene.position.y = 4;
 
             flight.paper = new THREE.MeshBasicMaterial({
@@ -129,26 +161,26 @@ function loadModels() {
 
             flight.airplane = new THREE.Mesh(gltf.scene, flight.paper);
 
-            flight.scene.add( gltf.scene );
-    
+            flight.scene.add(gltf.scene);
+
             gltf.animations; // Array<THREE.AnimationClip>
             gltf.scene; // THREE.Group
             gltf.scenes; // Array<THREE.Group>
             gltf.cameras; // Array<THREE.Camera>
             gltf.asset; // Object
-    
+
         },
         // called while loading is progressing
-        function ( xhr ) {
-    
-            console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
-    
+        function (xhr) {
+
+            console.log((xhr.loaded / xhr.total * 100) + '% loaded');
+
         },
         // called when loading has errors
-        function ( error ) {
-    
-            console.log( 'An error happened' );
-    
+        function (error) {
+
+            console.log('An error happened');
+
         }
     );
 }
