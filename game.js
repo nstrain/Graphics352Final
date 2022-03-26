@@ -11,7 +11,7 @@ import { GLTFLoader } from "./js/lib/GLTFLoader.js"
 $(document).ready(function () { flight.init(); });
 
 var flight = {
-    roomSize: 1000,
+    roomSize: 100,
     viewerDistance: 2,
 };
 
@@ -27,7 +27,7 @@ flight.init = function () {
 
     flight.scene.add(flight.camGroup);
     // flight.camera.position.x = 4;
-    // flight.camera.position.y = 4;
+    flight.camera.position.y = 10;
     // flight.camera.position.z = 7;
 
     flight.renderer = new THREE.WebGLRenderer();
@@ -50,7 +50,8 @@ function animate() {
     // flight.plane.position.z = flight.camera.position.z - 1.5 ;
 
 
-    
+
+
 
     // flight.plane.position.x = -1 * Math.cos( flight.camera.rotation.x ) + flight.camera.position.x;
     // flight.plane.position.y = -flight.viewerDistance * Math.cos( flight.camera.rotation.y ) + flight.camera.position.y;
@@ -73,7 +74,7 @@ function render() {
 function createEnvir() {
     const loader = new THREE.TextureLoader();
 
-    flight.flatPlane = new THREE.PlaneGeometry(flight.roomSize, flight.roomSize, flight.roomSize * 50);
+    flight.flatPlane = new THREE.PlaneGeometry(flight.roomSize, flight.roomSize);
     flight.carpetTexture1 = new THREE.MeshBasicMaterial({
         // color: 0x00cf00,
         map: loader.load("texture/carpet1.jpg")
@@ -81,15 +82,25 @@ function createEnvir() {
     flight.floor = new THREE.Mesh(flight.flatPlane, flight.carpetTexture1);
     flight.floor.rotateX(-Math.PI / 2);
     flight.floor.receiveShadow = true;
-    // flight.scene.add(flight.floor);
+    flight.floor.position.y = -flight.roomSize * (2/5) + 5;
+    flight.scene.add(flight.floor);
 
-    flight.box = new THREE.BoxGeometry(flight.roomSize, flight.roomSize, flight.roomSize);
+    flight.box = new THREE.BoxGeometry(flight.roomSize, flight.roomSize * (4/5), flight.roomSize);
     flight.skyboxTexture = new THREE.MeshBasicMaterial({
         map: loader.load("texture/cinderblock.jpg"),
         side: THREE.BackSide,
     });
     flight.skybox = new THREE.Mesh(flight.box, flight.skyboxTexture);
     flight.scene.add(flight.skybox);
+
+    flight.ceilingTexture1 = new THREE.MeshBasicMaterial({
+        map: loader.load("texture/ceilingTile.jpg"),
+    })
+    flight.ceiling = new THREE.Mesh(flight.flatPlane, flight.ceilingTexture1);
+    flight.ceiling.rotateX(Math.PI / 2);
+    flight.ceiling.position.y = flight.roomSize * (2/5) - 5;
+    flight.scene.add(flight.ceiling);
+
 }
 
 function controlSetUp() {
@@ -161,6 +172,35 @@ function loadModels() {
 
             // flight.scene.add( flight.plane );
             flight.camGroup.add(flight.plane);
+
+    
+        },
+        // called while loading is progressing
+        function ( xhr ) {
+    
+            console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
+    
+        },
+        // called when loading has errors
+        function ( error ) {
+    
+            console.log( 'An error happened' );
+    
+        }
+    );
+
+    loader.load(
+        'models/WoodenTable_01_4k/WoodenTable_01_4k.gltf',
+        function ( gltf ) {
+            
+            // gltf.scene.position.y = 4;
+            flight.table = gltf.scene;
+
+            // flight.plane.rotateZ(Math.PI/2);
+            flight.table.scale.set(20, 20, 20);
+            flight.table.position.y = -flight.roomSize * (2/5) + 5;
+
+            flight.scene.add( flight.table );
     
         },
         // called while loading is progressing
