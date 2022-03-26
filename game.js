@@ -65,7 +65,8 @@ flight.init = function () {
 function animate() {
     requestAnimationFrame(animate);
     // flight.controls.update();
-    if (!flight.crash) {
+    let go = true;
+    if (!flight.crash || go) {
         render();
     } else {
         // flight.overlay.add();
