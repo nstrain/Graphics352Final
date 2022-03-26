@@ -86,15 +86,21 @@ function render() {
 
     // console.log(flight.scene.children[0]);
 
-    for (let i = 0; i < flight.scene.children.length; i++) {
-        if (flight.scene.children[i].isMesh) {
-            flight.scene.children[i].material.color.set(0xffffff);
-        }
-    }
+    flight.controls.movementSpeed = 30;
+
+    // for (let i = 0; i < flight.scene.children.length; i++) {
+    //     if (flight.scene.children[i].isMesh) {
+    //         flight.scene.children[i].material.color.set(0xffffff);
+    //     }
+    // }
 
     for (let i = 0; i < intersects.length; i++) {
 
-        intersects[i].object.material.color.set(0xff0000);
+        // intersects[i].object.material.color.set(0xff0000);
+        if(intersects[i].distance < 1) {
+            flight.controls.movementSpeed = 0;
+            console.log("crash");
+        }
 
     }
 
@@ -257,7 +263,7 @@ function createRacewayTorus(){
     const loader = new THREE.TextureLoader();
     flight.racewayPhysical = new THREE.TorusGeometry(20, flight.raceTubeRadius, undefined, 30);
     flight.racetrackVisual = new THREE.MeshLambertMaterial({
-        color: 0xff0000,
+        color: 0xffffff,
         side: THREE.DoubleSide,
     });
     flight.race = new THREE.Mesh(flight.racewayPhysical, flight.racetrackVisual);
