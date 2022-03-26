@@ -133,7 +133,7 @@ function createEnvir() {
     flight.skybox = new THREE.Mesh(flight.box, flight.skyboxTexture);
     flight.scene.add(flight.skybox);
 
-    flight.centerWalls = new THREE.BoxGeometry(flight.roomSize/5, flight.roomSize * (4 / 5), flight.roomSize/5);
+    flight.centerWalls = new THREE.BoxGeometry(flight.roomSize/4, flight.roomSize * (4 / 5), flight.roomSize/4);
     flight.centerBox = new THREE.MeshBasicMaterial({
         map: loader.load("texture/cinderblock.jpg"),
     });
@@ -173,44 +173,73 @@ function lightingSetUp() {
 }
 
 function loadModels() {
-    // const loader = new OBJLoader();
-    // loader.load("models\PLANTS_ON_TABLE_obj\PLANTS_ON_TABLE_obj\PLANTS_ON_TABLE_10K.obj", function(obj) {
-    //     flight.scene.add(obj.scene);
-    // }, undefined, function (error){
-    //     console.error(error);
-    // })
-
-    // instantiate a loader
-
     const loader = new GLTFLoader();
+    const ground = -flight.roomSize * (2 / 5) + 5
 
     loader.load(
         'models/WoodenTable_01_4k/WoodenTable_01_4k.gltf',
         function (gltf) {
-
             // gltf.scene.position.y = 4;
             flight.table = gltf.scene;
-            const scalar = 30;
+            const scalar = 75;
             flight.table.scale.set(scalar, scalar, scalar);
-            flight.table.position.y = -flight.roomSize * (2 / 5) + 5;
+            flight.table.position.y = ground;
             flight.table.position.z = (flight.roomSize / 2) -30;
-
             flight.scene.add(flight.table);
-
         },
         // called while loading is progressing
         function (xhr) {
-
             console.log((xhr.loaded / xhr.total * 100) + '% loaded');
-
         },
         // called when loading has errors
         function (error) {
-
             console.log('An error happened');
-
         }
     );
+
+    loader.load(
+        'models/SchoolDesk_01_4k/SchoolDesk_01_4k.gltf',
+        function (gltf) {
+            // gltf.scene.position.y = 4;
+            flight.desk = gltf.scene;
+            const scalar = 75;
+            flight.desk.scale.set(scalar, scalar, scalar);
+            flight.desk.position.y = ground;
+            flight.desk.position.z = -(flight.roomSize / 2) +30;
+            flight.desk.rotateY(Math.PI);
+            flight.scene.add(flight.desk);
+        },
+        // called while loading is progressing
+        function (xhr) {
+            console.log((xhr.loaded / xhr.total * 100) + '% loaded');
+        },
+        // called when loading has errors
+        function (error) {
+            console.log('An error happened');
+        }
+    );
+
+    loader.load(
+        'models/steel_frame_shelves_01_4k/steel_frame_shelves_01_4k.gltf',
+        function (gltf) {
+            flight.shelf = gltf.scene;
+            const scalar = 8;
+            flight.shelf.scale.set(scalar, scalar, scalar);
+            flight.shelf.position.x = -(flight.roomSize / 2) + 50;
+            flight.shelf.position.y = ground;
+            flight.shelf.position.z = -(flight.roomSize / 2) + 20;
+            flight.scene.add(flight.shelf);
+        },
+        // called while loading is progressing
+        function (xhr) {
+            console.log((xhr.loaded / xhr.total * 100) + '% loaded');
+        },
+        // called when loading has errors
+        function (error) {
+            console.log('An error happened');
+        }
+    );
+
 }
 
 function loadAirplane() {
