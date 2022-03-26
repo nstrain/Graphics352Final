@@ -253,6 +253,7 @@ function createRacewayTorus() {
     flight.racetrackVisual = new THREE.MeshLambertMaterial({
         color: 0xffffff,
         side: THREE.DoubleSide,
+        map: loader.load("texture/crumpledPaper.jpg")
     });
     flight.race = new THREE.Mesh(flight.racewayPhysical, flight.racetrackVisual);
     flight.race.position.x = 20;
@@ -265,6 +266,7 @@ function createRacewayTorusKnot() {
     flight.racetrackVisual = new THREE.MeshLambertMaterial({
         color: 0xffffff,
         side: THREE.DoubleSide,
+        map
     });
     flight.race = new THREE.Mesh(flight.racewayPhysical, flight.racetrackVisual);
     // flight.race.position.x = 20;
