@@ -275,6 +275,50 @@ function loadModels() {
         }
     );
 
+    loader.load(
+        'models/black_leather_chair.gltf',
+        function (gltf) {
+            flight.chair = gltf.scene;
+            const scalar = 90;
+            flight.chair.scale.set(scalar, scalar, scalar);
+            flight.chair.position.x = (flight.roomSize / 2) - 50;
+            flight.chair.position.y = ground;
+            flight.chair.position.z = (flight.roomSize / 2) - 50;
+            flight.chair.rotateY(Math.PI);
+            flight.scene.add(flight.chair);
+        },
+        // called while loading is progressing
+        function (xhr) {
+            console.log((xhr.loaded / xhr.total * 100) + '% loaded');
+        },
+        // called when loading has errors
+        function (error) {
+            console.log('An error happened');
+        }
+    );
+
+    loader.load(
+        'models/PEACE_LILLY_gltf/PEACE_LILLY_gltf/PEACE_LILLY_5K.gltf',
+        function (gltf) {
+            flight.plant = gltf.scene;
+            const scalar = 90;
+            flight.plant.scale.set(scalar, scalar, scalar);
+            flight.plant.position.x = - 50;
+            flight.plant.position.y = ground + 40;
+            flight.plant.position.z = (flight.roomSize / 2) - 30;
+            // flight.plant.rotateY(Math.PI);
+            flight.scene.add(flight.plant);
+        },
+        // called while loading is progressing
+        function (xhr) {
+            console.log((xhr.loaded / xhr.total * 100) + '% loaded');
+        },
+        // called when loading has errors
+        function (error) {
+            console.log('An error happened');
+        }
+    );
+
 }
 
 function loadAirplane() {
