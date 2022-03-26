@@ -23,6 +23,7 @@ flight.init = function () {
     flight.camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
 
     flight.camGroup = new THREE.Group();
+    
     loadAirplane();
     flight.camGroup.add(flight.camera);
     
@@ -73,6 +74,10 @@ function render() {
     // console.log(flight.scene.children);
 
     // console.log(flight.scene.children[0]);
+
+    console.log(flight.planeStanderd);
+
+    flight.planeStanderd.updateMorphTargets([0.5,0.5]);
 
     flight.controls.movementSpeed = 30;
 
@@ -204,11 +209,12 @@ function loadAirplane() {
     const loader = new GLTFLoader();
     loader.load(
         // resource URL
-        'models/basePlane.glb',
+        'models/PlaneShaped.glb',
         // called when the resource is loaded
         function ( gltf ) {
             // gltf.scene.position.y = 4;
             flight.planeStanderd = gltf.scene;
+            // flight.mixer = new THREE.AnimationMixer( fligth.planeStanderd );
             // flight.planeStanderd.rotateZ(Math.PI/2);
             // flight.planeStanderd.position.x -= 5;
             
@@ -241,6 +247,7 @@ function createRacewayTorus(){
     flight.racetrackVisual = new THREE.MeshLambertMaterial({
         color: 0xffffff,
         side: THREE.DoubleSide,
+        map: loader.load("texture/crumpledPaper.jpg")
     });
     flight.race = new THREE.Mesh(flight.racewayPhysical, flight.racetrackVisual);
     flight.race.position.x = 20;
