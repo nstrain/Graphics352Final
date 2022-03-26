@@ -101,13 +101,14 @@ function render() {
 
         // intersects[i].object.material.color.set(0xff0000);
         if (intersects[i].distance < 1) {
+
             flight.controls.movementSpeed = 0;
             console.log("crash");
             kickStart = false;
             if(flight.start) {
                 flight.crash = true;
             }
-            flight.ambientFlightSound.stop();
+            // flight.ambientFlightSound.stop();
             // flight.crashSoundEffect.play();
         }
 
@@ -186,7 +187,8 @@ function lightingSetUp() {
 
 function loadModels() {
     const loader = new GLTFLoader();
-    const ground = -flight.roomSize * (2 / 5) + 5
+    const ground = -flight.roomSize * (2 / 5) + 5;
+    const ceiling = flight.roomSize * (2 / 5) - 5;
 
     loader.load(
         'models/WoodenTable_01_4k/WoodenTable_01_4k.gltf',
@@ -241,6 +243,27 @@ function loadModels() {
             flight.shelf.position.y = ground;
             flight.shelf.position.z = -(flight.roomSize / 2) + 20;
             flight.scene.add(flight.shelf);
+        },
+        // called while loading is progressing
+        function (xhr) {
+            console.log((xhr.loaded / xhr.total * 100) + '% loaded');
+        },
+        // called when loading has errors
+        function (error) {
+            console.log('An error happened');
+        }
+    );
+
+    loader.load(
+        'models/Fabricio_SP7_gLTF/Fabricio SP7 gLTF/Fabricio SP7 gLTF.gltf',
+        function (gltf) {
+            flight.fixture = gltf.scene;
+            const scalar = 90;
+            flight.fixture.scale.set(scalar, scalar, scalar);
+            flight.fixture.position.x = (flight.roomSize / 2) - 50;
+            flight.fixture.position.y = ceiling - scalar/2 + 5;
+            flight.fixture.position.z = -(flight.roomSize / 2) + 50;
+            flight.scene.add(flight.fixture);
         },
         // called while loading is progressing
         function (xhr) {
