@@ -11,7 +11,7 @@ import { GLTFLoader } from "./js/lib/GLTFLoader.js"
 $(document).ready(function () { flight.init(); });
 
 var flight = {
-    roomSize: 100,
+    roomSize: 300,
     viewerDistance: 2,
     raceTubeRadius: 15,
     crash: false,
@@ -39,7 +39,8 @@ flight.init = function () {
     flight.pointer.x = 1;
     flight.pointer.y = 1;
 
-    // loadModels();
+
+    loadModels();
     // createRacewayTorus();
     // createRacewayTorusKnot();
     createEnvir();
@@ -132,6 +133,15 @@ function createEnvir() {
     flight.skybox = new THREE.Mesh(flight.box, flight.skyboxTexture);
     flight.scene.add(flight.skybox);
 
+    flight.centerWalls = new THREE.BoxGeometry(flight.roomSize/5, flight.roomSize * (4 / 5), flight.roomSize/5);
+    flight.centerBox = new THREE.MeshBasicMaterial({
+        map: loader.load("texture/cinderblock.jpg"),
+    });
+    flight.scene.add(new THREE.Mesh(flight.centerWalls, flight.centerBox));
+
+
+
+
     flight.ceilingTexture1 = new THREE.MeshBasicMaterial({
         map: loader.load("texture/ceilingTile.jpg"),
     })
@@ -180,9 +190,10 @@ function loadModels() {
 
             // gltf.scene.position.y = 4;
             flight.table = gltf.scene;
-
-            flight.table.scale.set(20, 20, 20);
+            const scalar = 30;
+            flight.table.scale.set(scalar, scalar, scalar);
             flight.table.position.y = -flight.roomSize * (2 / 5) + 5;
+            flight.table.position.z = (flight.roomSize / 2) -30;
 
             flight.scene.add(flight.table);
 
