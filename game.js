@@ -13,6 +13,7 @@ $(document).ready(function () { flight.init(); });
 var flight = {
     roomSize: 100,
     viewerDistance: 2,
+    raceTubeRadius: 10,
 };
 
 flight.init = function () {
@@ -23,11 +24,12 @@ flight.init = function () {
 
     flight.camGroup = new THREE.Group();
     loadModels();
+    loadAirplane();
     flight.camGroup.add(flight.camera);
 
     flight.scene.add(flight.camGroup);
     // flight.camera.position.x = 4;
-    flight.camera.position.y = 10;
+    // flight.camera.position.y = 10;
     // flight.camera.position.z = 7;
 
     flight.renderer = new THREE.WebGLRenderer();
@@ -41,7 +43,7 @@ flight.init = function () {
     flight.pointer.x = 1;
     flight.pointer.y = 1;
 
-
+    // createRacewayTorus();
     createEnvir();
     controlSetUp();
     lightingSetUp();
@@ -55,10 +57,6 @@ function animate() {
     // flight.plane.position.x = flight.camera.position.x;
     // flight.plane.position.y = flight.camera.position.y - 1.5;
     // flight.plane.position.z = flight.camera.position.z - 1.5 ;
-
-
-
-
 
     // flight.plane.position.x = -1 * Math.cos( flight.camera.rotation.x ) + flight.camera.position.x;
     // flight.plane.position.y = -flight.viewerDistance * Math.cos( flight.camera.rotation.y ) + flight.camera.position.y;
@@ -82,11 +80,11 @@ function render() {
 
     // calculate objects intersecting the picking ray
     const intersects = flight.raycaster.intersectObjects(flight.scene.children);
-    console.log(intersects);
+    // console.log(intersects);
 
-    console.log(flight.scene.children);
+    // console.log(flight.scene.children);
 
-    console.log(flight.scene.children[0]);
+    // console.log(flight.scene.children[0]);
 
     for (let i = 0; i < flight.scene.children.length; i++) {
         if (flight.scene.children[i].isMesh) {
@@ -164,7 +162,7 @@ function lightingSetUp() {
     flight.directionalLight.position.set(1, 1, 1);
     flight.scene.add(flight.directionalLight);
 
-    flight.ambientLight = new THREE.AmbientLight(0xffffff);
+    flight.ambientLight = new THREE.AmbientLight(0xaaaaaa);
     flight.scene.add(flight.ambientLight);
 }
 
@@ -181,6 +179,39 @@ function loadModels() {
 
     const loader = new GLTFLoader();
 
+    
+
+    loader.load(
+        'models/WoodenTable_01_4k/WoodenTable_01_4k.gltf',
+        function ( gltf ) {
+            
+            // gltf.scene.position.y = 4;
+            flight.table = gltf.scene;
+
+            // flight.plane.rotateZ(Math.PI/2);
+            flight.table.scale.set(20, 20, 20);
+            flight.table.position.y = -flight.roomSize * (2/5) + 5;
+
+            flight.scene.add( flight.table );
+    
+        },
+        // called while loading is progressing
+        function (xhr) {
+
+            console.log((xhr.loaded / xhr.total * 100) + '% loaded');
+
+        },
+        // called when loading has errors
+        function (error) {
+
+            console.log('An error happened');
+
+        }
+    );
+}
+
+function loadAirplane() {
+    const loader = new GLTFLoader();
     loader.load(
         // resource URL
         'models/basePlane.glb',
@@ -223,32 +254,19 @@ function loadModels() {
     
         }
     );
+}
 
-    loader.load(
-        'models/WoodenTable_01_4k/WoodenTable_01_4k.gltf',
-        function ( gltf ) {
-            
-            // gltf.scene.position.y = 4;
-            flight.table = gltf.scene;
+function createRacewayTorus(){
+    const loader = new THREE.TextureLoader();
+    flight.racewayPhysical = new THREE.TorusGeometry(20, flight.raceTubeRadius, undefined, 30);
+    flight.racetrackVisual = new THREE.MeshLambertMaterial({
+        color: 0xff0000,
+        side: THREE.DoubleSide,
+    });
+    flight.race = new THREE.Mesh(flight.racewayPhysical, flight.racetrackVisual);
+    flight.scene.add(flight.race);
+}
 
-            // flight.plane.rotateZ(Math.PI/2);
-            flight.table.scale.set(20, 20, 20);
-            flight.table.position.y = -flight.roomSize * (2/5) + 5;
+function createRacewayTorusKnot(){
 
-            flight.scene.add( flight.table );
-    
-        },
-        // called while loading is progressing
-        function (xhr) {
-
-            console.log((xhr.loaded / xhr.total * 100) + '% loaded');
-
-        },
-        // called when loading has errors
-        function (error) {
-
-            console.log('An error happened');
-
-        }
-    );
 }
