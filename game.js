@@ -11,7 +11,8 @@ import { GLTFLoader } from "./js/lib/GLTFLoader.js"
 $(document).ready(function () { flight.init(); });
 
 var flight = {
-    roomSize: 1000,
+    roomSize: 100,
+    viewerDistance: 2,
 };
 
 flight.init = function () {
@@ -19,13 +20,20 @@ flight.init = function () {
 
     flight.scene = new THREE.Scene();
     flight.camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-    flight.camera.position.x = 4;
-    flight.camera.position.y = 4;
-    flight.camera.position.z = 7;
+
+    flight.camGroup = new THREE.Group();
+    loadModels();
+    flight.camGroup.add(flight.camera);
+
+    flight.scene.add(flight.camGroup);
+    // flight.camera.position.x = 4;
+    flight.camera.position.y = 10;
+    // flight.camera.position.z = 7;
 
     flight.renderer = new THREE.WebGLRenderer();
     flight.renderer.setSize(window.innerWidth, window.innerHeight);
     document.body.appendChild(flight.renderer.domElement);
+
 
     //collision
     flight.raycaster = new THREE.Raycaster();
@@ -33,7 +41,7 @@ flight.init = function () {
     flight.pointer.x = 1;
     flight.pointer.y = 1;
 
-    loadModels();
+
     createEnvir();
     controlSetUp();
     lightingSetUp();
@@ -43,6 +51,23 @@ flight.init = function () {
 function animate() {
     requestAnimationFrame(animate);
     // flight.controls.update();
+
+    // flight.plane.position.x = flight.camera.position.x;
+    // flight.plane.position.y = flight.camera.position.y - 1.5;
+    // flight.plane.position.z = flight.camera.position.z - 1.5 ;
+
+
+
+
+
+    // flight.plane.position.x = -1 * Math.cos( flight.camera.rotation.x ) + flight.camera.position.x;
+    // flight.plane.position.y = -flight.viewerDistance * Math.cos( flight.camera.rotation.y ) + flight.camera.position.y;
+    // flight.plane.position.z = -flight.viewerDistance * Math.cos( flight.camera.rotation.z ) + flight.camera.position.z;
+
+    // flight.plane.rotation.x = flight.camera.rotation.x;
+    // flight.plane.rotation.y = flight.camera.rotation.y;
+    // // console.log(flight.camera.rotation.y);
+    // flight.plane.rotation.z = flight.camera.rotation.z;
 
     render();
     flight.renderer.render(flight.scene, flight.camera);
@@ -82,7 +107,7 @@ function render() {
 function createEnvir() {
     const loader = new THREE.TextureLoader();
 
-    flight.flatPlane = new THREE.PlaneGeometry(flight.roomSize, flight.roomSize, flight.roomSize * 50);
+    flight.flatPlane = new THREE.PlaneGeometry(flight.roomSize, flight.roomSize);
     flight.carpetTexture1 = new THREE.MeshBasicMaterial({
         // color: 0x00cf00,
         map: loader.load("texture/carpet1.jpg")
@@ -90,24 +115,34 @@ function createEnvir() {
     flight.floor = new THREE.Mesh(flight.flatPlane, flight.carpetTexture1);
     flight.floor.rotateX(-Math.PI / 2);
     flight.floor.receiveShadow = true;
+    flight.floor.position.y = -flight.roomSize * (2/5) + 5;
     flight.scene.add(flight.floor);
 
-    flight.box = new THREE.BoxGeometry(flight.roomSize, flight.roomSize, flight.roomSize);
+    flight.box = new THREE.BoxGeometry(flight.roomSize, flight.roomSize * (4/5), flight.roomSize);
     flight.skyboxTexture = new THREE.MeshBasicMaterial({
         map: loader.load("texture/cinderblock.jpg"),
         side: THREE.BackSide,
     });
     flight.skybox = new THREE.Mesh(flight.box, flight.skyboxTexture);
     flight.scene.add(flight.skybox);
+
+    flight.ceilingTexture1 = new THREE.MeshBasicMaterial({
+        map: loader.load("texture/ceilingTile.jpg"),
+    })
+    flight.ceiling = new THREE.Mesh(flight.flatPlane, flight.ceilingTexture1);
+    flight.ceiling.rotateX(Math.PI / 2);
+    flight.ceiling.position.y = flight.roomSize * (2/5) - 5;
+    flight.scene.add(flight.ceiling);
+
 }
 
 function controlSetUp() {
-    flight.controls = new FlyControls(flight.camera, flight.renderer.domElement);
+    flight.controls = new FlyControls(flight.camGroup, flight.renderer.domElement);
     // Forces the camera/ controls forward, similar to a normal flight sim
-    flight.controls.autoForward = true;
+    flight.controls.autoForward = false;
     // I will include the movement speed and the roll speed, but set to the default just to show what work is being done
-    flight.controls.movementSpeed = 50;
-    flight.controls.rollSpeed = 0.75;
+    flight.controls.movementSpeed = 30;
+    flight.controls.rollSpeed = 0.5;
     // controls.rollSpeed = Math.PI / 24;
     flight.controls.domElement = flight.renderer.domElement;
 
@@ -148,27 +183,60 @@ function loadModels() {
 
     loader.load(
         // resource URL
-        'models/PlaneLeftDown.glb',
+        'models/basePlane.glb',
         // called when the resource is loaded
-        function (gltf) {
 
-            gltf.scene.position.y = 4;
+        function ( gltf ) {
+            
+            // gltf.scene.position.y = 4;
+            flight.plane = gltf.scene;
 
-            flight.paper = new THREE.MeshBasicMaterial({
-                color: 0xeeeadf,
-                side: THREE.DoubleSide,
-            });
+            // flight.plane.rotateZ(Math.PI/2);
+            // flight.plane.position.x -= 5;
+            
+            flight.plane.position.z -= 1;
+            flight.plane.position.y -= 0.25;
+            flight.plane.rotation.y += Math.PI;
+            flight.plane.rotation.x += Math.PI/12;
 
-            flight.airplane = new THREE.Mesh(gltf.scene, flight.paper);
+            
 
-            flight.scene.add(gltf.scene);
 
-            gltf.animations; // Array<THREE.AnimationClip>
-            gltf.scene; // THREE.Group
-            gltf.scenes; // Array<THREE.Group>
-            gltf.cameras; // Array<THREE.Camera>
-            gltf.asset; // Object
+            flight.plane.scale.set(0.25,0.25,0.25);
+            console.log(flight.plane);
 
+            // flight.scene.add( flight.plane );
+            flight.camGroup.add(flight.plane);
+
+    
+        },
+        // called while loading is progressing
+        function ( xhr ) {
+    
+            console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
+    
+        },
+        // called when loading has errors
+        function ( error ) {
+    
+            console.log( 'An error happened' );
+    
+        }
+    );
+
+    loader.load(
+        'models/WoodenTable_01_4k/WoodenTable_01_4k.gltf',
+        function ( gltf ) {
+            
+            // gltf.scene.position.y = 4;
+            flight.table = gltf.scene;
+
+            // flight.plane.rotateZ(Math.PI/2);
+            flight.table.scale.set(20, 20, 20);
+            flight.table.position.y = -flight.roomSize * (2/5) + 5;
+
+            flight.scene.add( flight.table );
+    
         },
         // called while loading is progressing
         function (xhr) {
