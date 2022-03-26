@@ -19,9 +19,11 @@ var flight = {
 
 flight.init = function () {
     flight.clock = new THREE.Clock();
+    flight.start = false;
 
     flight.scene = new THREE.Scene();
     flight.camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+    flight.camera.position.z -= 3;
 
     flight.camGroup = new THREE.Group();
     loadAirplane();
@@ -93,17 +95,26 @@ function render() {
     //         flight.scene.children[i].material.color.set(0xffffff);
     //     }
     // }
-
+    let kickStart = true;
     for (let i = 0; i < intersects.length; i++) {
 
         // intersects[i].object.material.color.set(0xff0000);
         if (intersects[i].distance < 1) {
             flight.controls.movementSpeed = 0;
             console.log("crash");
-            // flight.crash = true;
+            kickStart = false;
+            if(flight.start) {
+                flight.crash = true;
+            }
             flight.ambientFlightSound.stop();
             // flight.crashSoundEffect.play();
         }
+
+        if(kickStart) {
+            flight.start = true;
+            // console.log(flight.start);
+
+        } 
 
     }
 
@@ -225,7 +236,7 @@ function loadAirplane() {
             // flight.planeStanderd.rotateZ(Math.PI/2);
             // flight.planeStanderd.position.x -= 5;
 
-            flight.planeStanderd.position.z -= 0.11;
+            flight.planeStanderd.position.z -= 0.11 + 3;
             flight.planeStanderd.position.y -= 0.01;
             flight.planeStanderd.rotation.y += Math.PI;
             flight.planeStanderd.rotation.x += Math.PI / 12;
