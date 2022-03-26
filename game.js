@@ -23,10 +23,9 @@ flight.init = function () {
     flight.camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
 
     flight.camGroup = new THREE.Group();
-    loadModels();
     loadAirplane();
     flight.camGroup.add(flight.camera);
-
+    
     flight.scene.add(flight.camGroup);
     // flight.camera.position.x = 4;
     // flight.camera.position.y = 10;
@@ -35,16 +34,17 @@ flight.init = function () {
     flight.renderer = new THREE.WebGLRenderer();
     flight.renderer.setSize(window.innerWidth, window.innerHeight);
     document.body.appendChild(flight.renderer.domElement);
-
-
+    
+    
     //collision
     flight.raycaster = new THREE.Raycaster();
     flight.pointer = new THREE.Vector2();
     flight.pointer.x = 1;
     flight.pointer.y = 1;
-
-    // createRacewayTorus();
-    createEnvir();
+    
+    // loadModels();
+    createRacewayTorus();
+    // createEnvir();
     controlSetUp();
     lightingSetUp();
     animate();
@@ -162,7 +162,7 @@ function lightingSetUp() {
     flight.directionalLight.position.set(1, 1, 1);
     flight.scene.add(flight.directionalLight);
 
-    flight.ambientLight = new THREE.AmbientLight(0xaaaaaa);
+    flight.ambientLight = new THREE.AmbientLight(0xaaaaaa, 1);
     flight.scene.add(flight.ambientLight);
 }
 
@@ -176,10 +176,7 @@ function loadModels() {
 
     // instantiate a loader
 
-
     const loader = new GLTFLoader();
-
-    
 
     loader.load(
         'models/WoodenTable_01_4k/WoodenTable_01_4k.gltf',
@@ -264,6 +261,7 @@ function createRacewayTorus(){
         side: THREE.DoubleSide,
     });
     flight.race = new THREE.Mesh(flight.racewayPhysical, flight.racetrackVisual);
+    flight.race.position.x = 20;
     flight.scene.add(flight.race);
 }
 
