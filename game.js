@@ -14,6 +14,7 @@ var flight = {
     roomSize: 100,
     viewerDistance: 2,
     raceTubeRadius: 10,
+    crash: false,
 };
 
 flight.init = function () {
@@ -35,27 +36,38 @@ flight.init = function () {
     flight.renderer.setSize(window.innerWidth, window.innerHeight);
     document.body.appendChild(flight.renderer.domElement);
     
-    
     //collision
     flight.raycaster = new THREE.Raycaster();
     flight.pointer = new THREE.Vector2();
     flight.pointer.x = 1;
     flight.pointer.y = 1;
-    
+
     // loadModels();
     createRacewayTorus();
     // createEnvir();
     controlSetUp();
     lightingSetUp();
     // eventHandler();
-    animate();
+
+
+    const startButton = document.getElementById( 'startButton' );
+	startButton.addEventListener( 'click', function startUp(){
+        const overlay = document.getElementById( 'overlay' );
+			overlay.remove();
+        audioLoader();
+        animate();
+
+    } );
+
+    
 }
 
 function animate() {
     requestAnimationFrame(animate);
     // flight.controls.update();
-
-    render();
+    if (!flight.crash){
+        render();
+    }
     flight.renderer.render(flight.scene, flight.camera);
 }
 
@@ -88,6 +100,9 @@ function render() {
         if(intersects[i].distance < 1) {
             flight.controls.movementSpeed = 0;
             console.log("crash");
+            flight.crash = true;
+            flight.ambientFlightSound.stop();
+            flight.crashSoundEffect.play();
         }
 
     }
@@ -137,18 +152,6 @@ function controlSetUp() {
     flight.controls.rollSpeed = 0.5;
     // controls.rollSpeed = Math.PI / 24;
     flight.controls.domElement = flight.renderer.domElement;
-
-
-    // flight.controls = new FlyControls( flight.camera, flight.renderer.domElement );
-
-    // flight.controls.movementSpeed = 1;
-    // flight.controls.domElement = flight.renderer.domElement;
-    // flight.controls.rollSpeed = Math.PI / 24;
-    // flight.controls.autoForward = true;
-    // flight.controls.dragToLook = false;
-
-
-
 }
 
 function lightingSetUp() {
@@ -320,4 +323,61 @@ function eventHandler(){
         }
 
     };
+
+    document.addEventListener('click', function () {
+        audioLoader();
+    })
 }
+
+function audioLoader(){
+    const audioListener = new THREE.AudioListener();
+    const loader = new THREE.AudioLoader();
+
+    flight.camera.add (audioListener);
+
+    flight.ambientFlightSound = new THREE.Audio(audioListener);
+    
+    flight.crashSoundEffect = new THREE.Audio(audioListener);
+    flight.scene.add(flight.ambientFlightSound);
+    flight.scene.add(flight.crashSoundEffect)
+
+    loader.load(
+        'audio/Papers Rustling in the wind.mp3',
+        function (audioBuffer){
+            flight.ambientFlightSound.setBuffer(audioBuffer);
+            flight.ambientFlightSound.play();
+        },
+        function ( xhr ) {
+            console.log( (xhr.loaded / xhr.total * 100) + '% loaded' );
+        },
+        // onError callback
+        function ( err ) {
+            console.log( 'An error happened' );
+        }
+    );
+
+    loader.load(
+        "audio/Crash .mp3",
+        function (audioBuffer){
+            flight.crashSoundEffect.setBuffer(audioBuffer);
+        },
+        function ( xhr ) {
+            console.log( (xhr.loaded / xhr.total * 100) + '% loaded' );
+        },
+        // onError callback
+        function ( err ) {
+            console.log( 'An error happened' );
+        }
+    );
+}
+
+// function crashSoundEffect(){
+//     const audioListener = new THREE.AudioListener();
+//     const loader = new THREE.AudioLoader();
+//     flight.camera.add (audioListener);
+
+//     flight.crashSound = new THREE.Audio(audioListener);
+//     flight.scene.add(crashSound);
+
+    
+// }
