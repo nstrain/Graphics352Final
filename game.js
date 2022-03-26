@@ -152,9 +152,6 @@ function createEnvir() {
     });
     flight.scene.add(new THREE.Mesh(flight.centerWalls, flight.centerBox));
 
-
-
-
     flight.ceilingTexture1 = new THREE.MeshBasicMaterial({
         map: loader.load("texture/ceilingTile.jpg"),
     })
@@ -162,7 +159,7 @@ function createEnvir() {
     flight.ceiling.rotateX(Math.PI / 2);
     flight.ceiling.position.y = flight.roomSize * (2 / 5) - 5;
     flight.scene.add(flight.ceiling);
-
+    posterCreator();
 }
 
 function controlSetUp() {
@@ -485,4 +482,19 @@ function audioLoader() {
             console.log('An error happened');
         }
     );
+}
+
+function posterCreator(){
+    const loader = new THREE.TextureLoader();
+    const scalar = 3;
+    flight.posterFrame = new THREE.BoxGeometry(1, scalar*40, scalar*27);
+    flight.posterPicture = new THREE.MeshBasicMaterial({
+        map: loader.load('texture/airplaneBlock.png'),
+        side: THREE.DoubleSide,
+    });
+    flight.posterComposite = new THREE.Mesh(flight.posterFrame, flight.posterPicture);
+    flight.posterComposite.position.x = flight.roomSize / 2 - 1;
+    // flight.posterComposite.position.y = ;
+    // flight.posterComposite.position.z = 
+    flight.scene.add(flight.posterComposite);
 }
