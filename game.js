@@ -6,9 +6,13 @@ import * as THREE from "./js/lib/three.module.js";
 import { FlyControls } from "./js/lib/FlyControls.js"
 import { OBJLoader } from "./js/lib/OBJLoader.js"
 
+import { GLTFLoader } from "./js/lib/GLTFLoader.js"
+
 $(document).ready(function () { flight.init(); });
 
-var flight = {};
+var flight = {
+    roomSize: 1000,
+};
 
 flight.init = function () {
     flight.clock = new THREE.Clock();
@@ -23,11 +27,7 @@ flight.init = function () {
     flight.renderer.setSize(window.innerWidth, window.innerHeight);
     document.body.appendChild(flight.renderer.domElement);
 
-
-
-
-
-    loadModels();
+    // loadModels();
     createEnvir();
     controlSetUp();
     lightingSetUp();
@@ -50,7 +50,7 @@ function render() {
 function createEnvir() {
     const loader = new THREE.TextureLoader();
 
-    flight.flatPlane = new THREE.PlaneGeometry(100, 100, 50);
+    flight.flatPlane = new THREE.PlaneGeometry(flight.roomSize, flight.roomSize, flight.roomSize * 50);
     flight.carpetTexture1 = new THREE.MeshBasicMaterial({
         // color: 0x00cf00,
         map: loader.load("texture/carpet1.jpg")
@@ -60,13 +60,13 @@ function createEnvir() {
     flight.floor.receiveShadow = true;
     flight.scene.add(flight.floor);
 
-    flight.box = new THREE.BoxGeometry(100, 100, 100);
+    flight.box = new THREE.BoxGeometry(flight.roomSize, flight.roomSize, flight.roomSize);
     flight.skyboxTexture = new THREE.MeshBasicMaterial({
-        map: loader.load("texture/skybox.png"),
+        map: loader.load("texture/cinderblock.jpg"),
         side: THREE.BackSide,
     });
     flight.skybox = new THREE.Mesh(flight.box, flight.skyboxTexture);
-    // flight.scene.add(flight.skybox);
+    flight.scene.add(flight.skybox);
 }
 
 function controlSetUp() {
@@ -102,10 +102,53 @@ function lightingSetUp() {
 }
 
 function loadModels() {
-    const loader = new OBJLoader();
-    loader.load("models\PLANTS_ON_TABLE_obj\PLANTS_ON_TABLE_obj\PLANTS_ON_TABLE_10K.obj", function(obj) {
-        flight.scene.add(obj.scene);
-    }, undefined, function (error){
-        console.error(error);
-    })
+    // const loader = new OBJLoader();
+    // loader.load("models\PLANTS_ON_TABLE_obj\PLANTS_ON_TABLE_obj\PLANTS_ON_TABLE_10K.obj", function(obj) {
+    //     flight.scene.add(obj.scene);
+    // }, undefined, function (error){
+    //     console.error(error);
+    // })
+
+    // instantiate a loader
+
+    
+    const loader = new GLTFLoader();
+    
+    loader.load(
+        // resource URL
+        'models/PlaneLeftDown.glb',
+        // called when the resource is loaded
+        function ( gltf ) {
+            
+            gltf.scene.position.y = 4;
+
+            flight.paper = new THREE.MeshBasicMaterial({
+                color: 0xeeeadf,
+                side: THREE.DoubleSide,
+            });
+
+            flight.airplane = new THREE.Mesh(gltf.scene, flight.paper);
+
+            flight.scene.add( gltf.scene );
+    
+            gltf.animations; // Array<THREE.AnimationClip>
+            gltf.scene; // THREE.Group
+            gltf.scenes; // Array<THREE.Group>
+            gltf.cameras; // Array<THREE.Camera>
+            gltf.asset; // Object
+    
+        },
+        // called while loading is progressing
+        function ( xhr ) {
+    
+            console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
+    
+        },
+        // called when loading has errors
+        function ( error ) {
+    
+            console.log( 'An error happened' );
+    
+        }
+    );
 }
