@@ -39,6 +39,7 @@ flight.init = function () {
     flight.pointer.x = 1;
     flight.pointer.y = 1;
 
+
     loadModels();
     // createRacewayTorus();
     // createRacewayTorusKnot();
@@ -65,7 +66,7 @@ function animate() {
     if (!flight.crash) {
         render();
     } else {
-        flight.overlay.add();
+        // flight.overlay.add();
     }
     flight.renderer.render(flight.scene, flight.camera);
 }
@@ -79,7 +80,7 @@ function render() {
 
     // calculate objects intersecting the picking ray
     const intersects = flight.raycaster.intersectObjects(flight.scene.children);
-    // console.log(intersects);
+    console.log(intersects);
 
     // console.log(flight.scene.children);
 
@@ -224,12 +225,12 @@ function loadAirplane() {
             // flight.planeStanderd.rotateZ(Math.PI/2);
             // flight.planeStanderd.position.x -= 5;
 
-            flight.planeStanderd.position.z -= 1;
-            flight.planeStanderd.position.y -= 0.25;
+            flight.planeStanderd.position.z -= 0.11;
+            flight.planeStanderd.position.y -= 0.01;
             flight.planeStanderd.rotation.y += Math.PI;
             flight.planeStanderd.rotation.x += Math.PI / 12;
 
-            flight.planeStanderd.scale.set(0.25, 0.25, 0.25);
+            flight.planeStanderd.scale.set(0.05, 0.05, 0.05);
             console.log(flight.planeStanderd);
 
             // flight.scene.add( flight.planeStanderd );
