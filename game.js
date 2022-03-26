@@ -34,7 +34,14 @@ flight.init = function () {
     flight.renderer.setSize(window.innerWidth, window.innerHeight);
     document.body.appendChild(flight.renderer.domElement);
 
-    
+
+    //collision
+    flight.raycaster = new THREE.Raycaster();
+    flight.pointer = new THREE.Vector2();
+    flight.pointer.x = 1;
+    flight.pointer.y = 1;
+
+
     createEnvir();
     controlSetUp();
     lightingSetUp();
@@ -68,6 +75,32 @@ function animate() {
 
 function render() {
     const delta = flight.clock.getDelta();
+
+    //https://threejs.org/docs/index.html?q=ray#api/en/core/Raycaster
+    // update the picking ray with the camera and pointer position
+    flight.raycaster.setFromCamera(flight.pointer, flight.camera);
+
+    // calculate objects intersecting the picking ray
+    const intersects = flight.raycaster.intersectObjects(flight.scene.children);
+    console.log(intersects);
+
+    console.log(flight.scene.children);
+
+    console.log(flight.scene.children[0]);
+
+    for (let i = 0; i < flight.scene.children.length; i++) {
+        if (flight.scene.children[i].isMesh) {
+            flight.scene.children[i].material.color.set(0xffffff);
+        }
+    }
+
+    for (let i = 0; i < intersects.length; i++) {
+
+        intersects[i].object.material.color.set(0xff0000);
+
+    }
+
+
     flight.controls.update(delta);
 }
 
@@ -145,13 +178,14 @@ function loadModels() {
 
     // instantiate a loader
 
-    
+
     const loader = new GLTFLoader();
-    
+
     loader.load(
         // resource URL
         'models/basePlane.glb',
         // called when the resource is loaded
+
         function ( gltf ) {
             
             // gltf.scene.position.y = 4;
@@ -166,6 +200,7 @@ function loadModels() {
             flight.plane.rotation.x += Math.PI/12;
 
             
+
 
             flight.plane.scale.set(0.25,0.25,0.25);
             console.log(flight.plane);
@@ -204,16 +239,16 @@ function loadModels() {
     
         },
         // called while loading is progressing
-        function ( xhr ) {
-    
-            console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
-    
+        function (xhr) {
+
+            console.log((xhr.loaded / xhr.total * 100) + '% loaded');
+
         },
         // called when loading has errors
-        function ( error ) {
-    
-            console.log( 'An error happened' );
-    
+        function (error) {
+
+            console.log('An error happened');
+
         }
     );
 }
