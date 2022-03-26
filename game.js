@@ -20,6 +20,12 @@ flight.init = function () {
 
     flight.scene = new THREE.Scene();
     flight.camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+
+    flight.camGroup = new THREE.Group();
+    loadModels();
+    flight.camGroup.add(flight.camera);
+
+    flight.scene.add(flight.camGroup);
     // flight.camera.position.x = 4;
     // flight.camera.position.y = 4;
     // flight.camera.position.z = 7;
@@ -28,7 +34,7 @@ flight.init = function () {
     flight.renderer.setSize(window.innerWidth, window.innerHeight);
     document.body.appendChild(flight.renderer.domElement);
 
-    loadModels();
+    
     createEnvir();
     controlSetUp();
     lightingSetUp();
@@ -46,14 +52,14 @@ function animate() {
 
     
 
-    flight.plane.position.x = -1 * Math.cos( flight.camera.rotation.x ) + flight.camera.position.x;
-    flight.plane.position.y = -flight.viewerDistance * Math.cos( flight.camera.rotation.y ) + flight.camera.position.y;
-    flight.plane.position.z = -flight.viewerDistance * Math.cos( flight.camera.rotation.z ) + flight.camera.position.z;
+    // flight.plane.position.x = -1 * Math.cos( flight.camera.rotation.x ) + flight.camera.position.x;
+    // flight.plane.position.y = -flight.viewerDistance * Math.cos( flight.camera.rotation.y ) + flight.camera.position.y;
+    // flight.plane.position.z = -flight.viewerDistance * Math.cos( flight.camera.rotation.z ) + flight.camera.position.z;
 
-    flight.plane.rotation.x = flight.camera.rotation.x;
-    flight.plane.rotation.y = flight.camera.rotation.y;
-    // console.log(flight.camera.rotation.y);
-    flight.plane.rotation.z = flight.camera.rotation.z;
+    // flight.plane.rotation.x = flight.camera.rotation.x;
+    // flight.plane.rotation.y = flight.camera.rotation.y;
+    // // console.log(flight.camera.rotation.y);
+    // flight.plane.rotation.z = flight.camera.rotation.z;
 
     render();
     flight.renderer.render(flight.scene, flight.camera);
@@ -87,7 +93,7 @@ function createEnvir() {
 }
 
 function controlSetUp() {
-    flight.controls = new FlyControls(flight.camera, flight.renderer.domElement);
+    flight.controls = new FlyControls(flight.camGroup, flight.renderer.domElement);
     // Forces the camera/ controls forward, similar to a normal flight sim
     flight.controls.autoForward = false;
     // I will include the movement speed and the roll speed, but set to the default just to show what work is being done
@@ -140,9 +146,21 @@ function loadModels() {
             // gltf.scene.position.y = 4;
             flight.plane = gltf.scene;
 
-            flight.plane.rotateZ(Math.PI/2);
+            // flight.plane.rotateZ(Math.PI/2);
+            // flight.plane.position.x -= 5;
+            
+            flight.plane.position.z -= 1;
+            flight.plane.position.y -= 0.25;
+            flight.plane.rotation.y += Math.PI;
+            flight.plane.rotation.x += Math.PI/12;
 
-            flight.scene.add( flight.plane );
+            
+
+            flight.plane.scale.set(0.25,0.25,0.25);
+            console.log(flight.plane);
+
+            // flight.scene.add( flight.plane );
+            flight.camGroup.add(flight.plane);
     
         },
         // called while loading is progressing
