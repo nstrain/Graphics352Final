@@ -168,20 +168,21 @@ function createEnvir() {
 function controlSetUp() {
     flight.controls = new FlyControls(flight.camGroup, flight.renderer.domElement);
     // Forces the camera/ controls forward, similar to a normal flight sim
-    flight.controls.autoForward = false;
+    flight.controls.autoForward = true;
     // I will include the movement speed and the roll speed, but set to the default just to show what work is being done
-    flight.controls.movementSpeed = 30;
-    flight.controls.rollSpeed = 0.5;
+    flight.controls.movementSpeed = 60;
+    flight.controls.rollSpeed = 0.65;
     // controls.rollSpeed = Math.PI / 24;
     flight.controls.domElement = flight.renderer.domElement;
 }
 
 function lightingSetUp() {
     flight.directionalLight = new THREE.DirectionalLight(0xffffff, 1);
-    flight.directionalLight.position.set(1, 1, 1);
+    // flight.directionalLight.position.set(1, 1, 1);
+    flight.directionalLight.position.set(flight.roomSize/2 - 50, flight.roomSize * (2 / 5) - 15, -(flight.roomSize / 2) + 50);
     flight.scene.add(flight.directionalLight);
 
-    flight.ambientLight = new THREE.AmbientLight(0xaaaaaa, 0.5);
+    flight.ambientLight = new THREE.AmbientLight(0xaaaaaa, 0.2);
     flight.scene.add(flight.ambientLight);
 }
 
@@ -190,8 +191,7 @@ function loadModels() {
     const ground = -flight.roomSize * (2 / 5) + 5;
     const ceiling = flight.roomSize * (2 / 5) - 5;
 
-    loader.load(
-        'models/WoodenTable_01_4k/WoodenTable_01_4k.gltf',
+    loader.load('models/WoodenTable_01_4k/WoodenTable_01_4k.gltf',
         function (gltf) {
             // gltf.scene.position.y = 4;
             flight.table = gltf.scene;
@@ -211,8 +211,7 @@ function loadModels() {
         }
     );
 
-    loader.load(
-        'models/SchoolDesk_01_4k/SchoolDesk_01_4k.gltf',
+    loader.load('models/SchoolDesk_01_4k/SchoolDesk_01_4k.gltf',
         function (gltf) {
             // gltf.scene.position.y = 4;
             flight.desk = gltf.scene;
@@ -233,8 +232,7 @@ function loadModels() {
         }
     );
 
-    loader.load(
-        'models/steel_frame_shelves_01_4k/steel_frame_shelves_01_4k.gltf',
+    loader.load('models/steel_frame_shelves_01_4k/steel_frame_shelves_01_4k.gltf',
         function (gltf) {
             flight.shelf = gltf.scene;
             const scalar = 8;
@@ -254,8 +252,7 @@ function loadModels() {
         }
     );
 
-    loader.load(
-        'models/Fabricio_SP7_gLTF/Fabricio SP7 gLTF/Fabricio SP7 gLTF.gltf',
+    loader.load('models/Fabricio_SP7_gLTF/Fabricio SP7 gLTF/Fabricio SP7 gLTF.gltf',
         function (gltf) {
             flight.fixture = gltf.scene;
             const scalar = 90;
@@ -275,8 +272,7 @@ function loadModels() {
         }
     );
 
-    loader.load(
-        'models/black_leather_chair.gltf',
+    loader.load('models/black_leather_chair.gltf',
         function (gltf) {
             flight.chair = gltf.scene;
             const scalar = 90;
@@ -297,8 +293,7 @@ function loadModels() {
         }
     );
 
-    loader.load(
-        'models/PEACE_LILLY_gltf/PEACE_LILLY_gltf/PEACE_LILLY_5K.gltf',
+    loader.load('models/PEACE_LILLY_gltf/PEACE_LILLY_gltf/PEACE_LILLY_5K.gltf',
         function (gltf) {
             flight.plant = gltf.scene;
             const scalar = 90;
