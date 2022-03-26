@@ -55,19 +55,6 @@ function animate() {
     requestAnimationFrame(animate);
     // flight.controls.update();
 
-    // flight.plane.position.x = flight.camera.position.x;
-    // flight.plane.position.y = flight.camera.position.y - 1.5;
-    // flight.plane.position.z = flight.camera.position.z - 1.5 ;
-
-    // flight.plane.position.x = -1 * Math.cos( flight.camera.rotation.x ) + flight.camera.position.x;
-    // flight.plane.position.y = -flight.viewerDistance * Math.cos( flight.camera.rotation.y ) + flight.camera.position.y;
-    // flight.plane.position.z = -flight.viewerDistance * Math.cos( flight.camera.rotation.z ) + flight.camera.position.z;
-
-    // flight.plane.rotation.x = flight.camera.rotation.x;
-    // flight.plane.rotation.y = flight.camera.rotation.y;
-    // // console.log(flight.camera.rotation.y);
-    // flight.plane.rotation.z = flight.camera.rotation.z;
-
     render();
     flight.renderer.render(flight.scene, flight.camera);
 }
@@ -192,7 +179,6 @@ function loadModels() {
             // gltf.scene.position.y = 4;
             flight.table = gltf.scene;
 
-            // flight.plane.rotateZ(Math.PI/2);
             flight.table.scale.set(20, 20, 20);
             flight.table.position.y = -flight.roomSize * (2/5) + 5;
 
@@ -220,44 +206,33 @@ function loadAirplane() {
         // resource URL
         'models/basePlane.glb',
         // called when the resource is loaded
-
         function ( gltf ) {
-            
             // gltf.scene.position.y = 4;
-            flight.plane = gltf.scene;
-
-            // flight.plane.rotateZ(Math.PI/2);
-            // flight.plane.position.x -= 5;
+            flight.planeStanderd = gltf.scene;
+            // flight.planeStanderd.rotateZ(Math.PI/2);
+            // flight.planeStanderd.position.x -= 5;
             
-            flight.plane.position.z -= 1;
-            flight.plane.position.y -= 0.25;
-            flight.plane.rotation.y += Math.PI;
-            flight.plane.rotation.x += Math.PI/12;
+            flight.planeStanderd.position.z -= 1;
+            flight.planeStanderd.position.y -= 0.25;
+            flight.planeStanderd.rotation.y += Math.PI;
+            flight.planeStanderd.rotation.x += Math.PI/12;
 
-            
+            flight.planeStanderd.scale.set(0.25,0.25,0.25);
+            console.log(flight.planeStanderd);
 
-
-            flight.plane.scale.set(0.25,0.25,0.25);
-            console.log(flight.plane);
-
-            // flight.scene.add( flight.plane );
-            flight.camGroup.add(flight.plane);
-
-    
+            // flight.scene.add( flight.planeStanderd );
+            flight.camGroup.add(flight.planeStanderd);
         },
         // called while loading is progressing
         function ( xhr ) {
-    
             console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
-    
         },
         // called when loading has errors
         function ( error ) {
-    
             console.log( 'An error happened' );
-    
         }
     );
+
 }
 
 function createRacewayTorus(){
