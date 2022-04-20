@@ -8,6 +8,9 @@ import { OBJLoader } from "./js/lib/OBJLoader.js"
 
 import { GLTFLoader } from "./js/lib/GLTFLoader.js"
 
+import { AnaglyphEffect } from './js/lib/AnaglyphEffect.js';
+
+
 $(document).ready(function () { flight.init(); });
 
 var flight = {
@@ -40,6 +43,9 @@ flight.init = function () {
     flight.pointer = new THREE.Vector2();
     flight.pointer.x = 1;
     flight.pointer.y = 1;
+
+    flight.effect = new AnaglyphEffect( flight.renderer );
+	flight.effect.setSize( window.innerWidth, window.innerHeight );
 
 
     // createRacewayTorus();
@@ -83,7 +89,7 @@ function render() {
 
     // calculate objects intersecting the picking ray
     const intersects = flight.raycaster.intersectObjects(flight.scene.children);
-    console.log(intersects);
+    // console.log(intersects);
 
     // console.log(flight.scene.children);
 
@@ -118,6 +124,7 @@ function render() {
         }
     }
     flight.controls.update(delta);
+    flight.effect.render( flight.scene, flight.camera );
 }
 
 function createEnvir() {
