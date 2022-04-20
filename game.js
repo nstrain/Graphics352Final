@@ -6,10 +6,7 @@ import * as THREE from "./js/lib/three.module.js";
 import { FlyControls } from "./js/lib/FlyControls.js"
 import { OBJLoader } from "./js/lib/OBJLoader.js"
 import { AnaglyphEffect } from './js/lib/AnaglyphEffect.js';
-
 import { GLTFLoader } from "./js/lib/GLTFLoader.js"
-
-
 
 $(document).ready(function () { flight.init(); });
 
@@ -27,13 +24,11 @@ flight.init = function () {
     flight.scene = new THREE.Scene();
     flight.camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
     flight.camera.position.z -= 3;
-
     flight.camera.focalLength = 3;
 
     flight.camGroup = new THREE.Group();
     loadAirplane();
     flight.camGroup.add(flight.camera);
-
     flight.scene.add(flight.camGroup);
 
     flight.renderer = new THREE.WebGLRenderer();
@@ -41,7 +36,6 @@ flight.init = function () {
     document.body.appendChild(flight.renderer.domElement);
 
     flight.renderer.setPixelRatio( window.devicePixelRatio );
-
 
     //collision
     flight.raycaster = new THREE.Raycaster();
@@ -54,7 +48,6 @@ flight.init = function () {
 
     flight.effect = new AnaglyphEffect( flight.renderer );
 	flight.effect.setSize( width, height );
-
 
     // createRacewayTorus();
     // createRacewayTorusKnot();
@@ -70,10 +63,7 @@ flight.init = function () {
         audioLoader();
         eventHandler();
         animate();
-
     });
-
-
 }
 
 function animate() {
@@ -85,7 +75,7 @@ function animate() {
     } else {
         // flight.overlay.add();
     }
-    // flight.renderer.render(flight.scene, flight.camera);
+    flight.renderer.render(flight.scene, flight.camera);
 }
 
 function render() {
@@ -98,11 +88,8 @@ function render() {
     // calculate objects intersecting the picking ray
     const intersects = flight.raycaster.intersectObjects(flight.scene.children);
     // console.log(intersects);
-
     // console.log(flight.scene.children);
-
     // console.log(flight.scene.children[0]);
-
     flight.controls.movementSpeed = 60;
 
     // for (let i = 0; i < flight.scene.children.length; i++) {
@@ -112,7 +99,6 @@ function render() {
     // }
     let kickStart = true;
     for (let i = 0; i < intersects.length; i++) {
-
         // intersects[i].object.material.color.set(0xff0000);
         if (intersects[i].distance < 1) {
 
@@ -125,7 +111,6 @@ function render() {
             // flight.ambientFlightSound.stop();
             // flight.crashSoundEffect.play();
         }
-
         if (kickStart) {
             flight.start = true;
             // console.log(flight.start);
@@ -186,9 +171,8 @@ function controlSetUp() {
 }
 
 function lightingSetUp() {
-    // flight.lightingModel = new THREE.PointLight(0xffffff, 0.75);
-    flight.lightingModel = new THREE.DirectionalLight(0xffffff, 1);
-
+    flight.lightingModel = new THREE.PointLight(0xffffff, 1);
+    // flight.lightingModel = new THREE.DirectionalLight(0xffffff, 1);
     // flight.lightingModel = new THREE.PointLight(0xffffff, 1, 0, 2);
     // flight.lightingModel.position.set(1, 1, 1);
     flight.lightingModel.position.set(flight.roomSize / 2 - 50, flight.roomSize * (2 / 5), -(flight.roomSize / 2) + 50);
@@ -205,7 +189,6 @@ function loadModels() {
 
     loader.load('models/WoodenTable_01_4k/WoodenTable_01_4k.gltf',
         function (gltf) {
-            // gltf.scene.position.y = 4;
             flight.table = gltf.scene;
             const scalar = 75;
             flight.table.scale.set(scalar, scalar, scalar);
@@ -225,7 +208,6 @@ function loadModels() {
 
     loader.load('models/SchoolDesk_01_4k/SchoolDesk_01_4k.gltf',
         function (gltf) {
-            // gltf.scene.position.y = 4;
             flight.desk = gltf.scene;
             const scalar = 75;
             flight.desk.scale.set(scalar, scalar, scalar);
@@ -335,7 +317,6 @@ function loadAirplane() {
         'models/basePlane.glb',
         // called when the resource is loaded
         function (gltf) {
-            // gltf.scene.position.y = 4;
             flight.planeStanderd = gltf.scene;
             // flight.planeStanderd.rotateZ(Math.PI/2);
             // flight.planeStanderd.position.x -= 5;
@@ -360,7 +341,6 @@ function loadAirplane() {
             console.log('An error happened');
         }
     );
-
 }
 
 function createRacewayTorus() {
@@ -518,8 +498,6 @@ function posterCreator() {
     });
     flight.posterComposite = new THREE.Mesh(flight.posterFrame, flight.posterPicture);
     flight.posterComposite.position.x = flight.roomSize / 2 - 1;
-    // flight.posterComposite.position.y = ;
-    // flight.posterComposite.position.z = 
     flight.scene.add(flight.posterComposite);
 }
 
