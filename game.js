@@ -8,6 +8,9 @@ import { OBJLoader } from "./js/lib/OBJLoader.js"
 
 import { GLTFLoader } from "./js/lib/GLTFLoader.js"
 
+import { AnaglyphEffect } from './js/lib/AnaglyphEffect.js';
+
+
 $(document).ready(function () { flight.init(); });
 
 var flight = {
@@ -22,7 +25,7 @@ flight.init = function () {
     flight.start = false;
 
     flight.scene = new THREE.Scene();
-    flight.camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+    flight.camera = new THREE.PerspectiveCamera(63, window.innerWidth / window.innerHeight, 0.1, 1000);
     flight.camera.position.z -= 3;
 
     flight.camGroup = new THREE.Group();
@@ -41,20 +44,23 @@ flight.init = function () {
     flight.pointer.x = 1;
     flight.pointer.y = 1;
 
+    flight.effect = new AnaglyphEffect( flight.renderer );
+	flight.effect.setSize( window.innerWidth, window.innerHeight );
 
-    loadModels();
+
     // createRacewayTorus();
     // createRacewayTorusKnot();
+    loadModels();
     createEnvir();
     controlSetUp();
     lightingSetUp();
-    // eventHandler();
 
     const startButton = document.getElementById('startButton');
     startButton.addEventListener('click', function startUp() {
         flight.overlay = document.getElementById('overlay');
         flight.overlay.remove();
         audioLoader();
+        eventHandler();
         animate();
 
     });
@@ -83,13 +89,13 @@ function render() {
 
     // calculate objects intersecting the picking ray
     const intersects = flight.raycaster.intersectObjects(flight.scene.children);
-    console.log(intersects);
+    // console.log(intersects);
 
     // console.log(flight.scene.children);
 
     // console.log(flight.scene.children[0]);
 
-    flight.controls.movementSpeed = 30;
+    flight.controls.movementSpeed = 60;
 
     // for (let i = 0; i < flight.scene.children.length; i++) {
     //     if (flight.scene.children[i].isMesh) {
@@ -105,23 +111,20 @@ function render() {
             flight.controls.movementSpeed = 0;
             console.log("crash");
             kickStart = false;
-            if(flight.start) {
+            if (flight.start) {
                 flight.crash = true;
             }
             // flight.ambientFlightSound.stop();
             // flight.crashSoundEffect.play();
         }
 
-        if(kickStart) {
+        if (kickStart) {
             flight.start = true;
             // console.log(flight.start);
-
-        } 
-
+        }
     }
-
-
     flight.controls.update(delta);
+    flight.effect.render( flight.scene, flight.camera );
 }
 
 function createEnvir() {
@@ -139,20 +142,20 @@ function createEnvir() {
     flight.scene.add(flight.floor);
 
     flight.box = new THREE.BoxGeometry(flight.roomSize, flight.roomSize * (4 / 5), flight.roomSize);
-    flight.skyboxTexture = new THREE.MeshBasicMaterial({
+    flight.skyboxTexture = new THREE.MeshLambertMaterial({
         map: loader.load("texture/cinderblock.jpg"),
         side: THREE.BackSide,
     });
     flight.skybox = new THREE.Mesh(flight.box, flight.skyboxTexture);
     flight.scene.add(flight.skybox);
 
-    flight.centerWalls = new THREE.BoxGeometry(flight.roomSize/4, flight.roomSize * (4 / 5), flight.roomSize/4);
-    flight.centerBox = new THREE.MeshBasicMaterial({
+    flight.centerWalls = new THREE.BoxGeometry(flight.roomSize / 4, flight.roomSize * (4 / 5), flight.roomSize / 4);
+    flight.centerBox = new THREE.MeshLambertMaterial({
         map: loader.load("texture/cinderblock.jpg"),
     });
     flight.scene.add(new THREE.Mesh(flight.centerWalls, flight.centerBox));
 
-    flight.ceilingTexture1 = new THREE.MeshBasicMaterial({
+    flight.ceilingTexture1 = new THREE.MeshLambertMaterial({
         map: loader.load("texture/ceilingTile.jpg"),
     })
     flight.ceiling = new THREE.Mesh(flight.flatPlane, flight.ceilingTexture1);
@@ -160,26 +163,30 @@ function createEnvir() {
     flight.ceiling.position.y = flight.roomSize * (2 / 5) - 5;
     flight.scene.add(flight.ceiling);
     posterCreator();
+    hoopCreator();
+    collectibleCreator();
 }
 
 function controlSetUp() {
     flight.controls = new FlyControls(flight.camGroup, flight.renderer.domElement);
     // Forces the camera/ controls forward, similar to a normal flight sim
-    flight.controls.autoForward = true;
     // I will include the movement speed and the roll speed, but set to the default just to show what work is being done
+    // flight.controls.autoForward = true;
     flight.controls.movementSpeed = 60;
     flight.controls.rollSpeed = 0.65;
-    // controls.rollSpeed = Math.PI / 24;
     flight.controls.domElement = flight.renderer.domElement;
 }
 
 function lightingSetUp() {
-    flight.directionalLight = new THREE.DirectionalLight(0xffffff, 1);
-    // flight.directionalLight.position.set(1, 1, 1);
-    flight.directionalLight.position.set(flight.roomSize/2 - 50, flight.roomSize * (2 / 5) - 15, -(flight.roomSize / 2) + 50);
-    flight.scene.add(flight.directionalLight);
+    // flight.lightingModel = new THREE.PointLight(0xffffff, 0.75);
+    flight.lightingModel = new THREE.DirectionalLight(0xffffff, 1);
 
-    flight.ambientLight = new THREE.AmbientLight(0xaaaaaa, 0.2);
+    // flight.lightingModel = new THREE.PointLight(0xffffff, 1, 0, 2);
+    // flight.lightingModel.position.set(1, 1, 1);
+    flight.lightingModel.position.set(flight.roomSize / 2 - 50, flight.roomSize * (2 / 5), -(flight.roomSize / 2) + 50);
+    flight.scene.add(flight.lightingModel);
+
+    flight.ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
     flight.scene.add(flight.ambientLight);
 }
 
@@ -195,7 +202,7 @@ function loadModels() {
             const scalar = 75;
             flight.table.scale.set(scalar, scalar, scalar);
             flight.table.position.y = ground;
-            flight.table.position.z = (flight.roomSize / 2) -30;
+            flight.table.position.z = (flight.roomSize / 2) - 30;
             flight.scene.add(flight.table);
         },
         // called while loading is progressing
@@ -215,7 +222,7 @@ function loadModels() {
             const scalar = 75;
             flight.desk.scale.set(scalar, scalar, scalar);
             flight.desk.position.y = ground;
-            flight.desk.position.z = -(flight.roomSize / 2) +30;
+            flight.desk.position.z = -(flight.roomSize / 2) + 30;
             flight.desk.rotateY(Math.PI);
             flight.scene.add(flight.desk);
         },
@@ -255,7 +262,7 @@ function loadModels() {
             const scalar = 90;
             flight.fixture.scale.set(scalar, scalar, scalar);
             flight.fixture.position.x = (flight.roomSize / 2) - 50;
-            flight.fixture.position.y = ceiling - scalar/2 + 5;
+            flight.fixture.position.y = ceiling - scalar / 2 + 5;
             flight.fixture.position.z = -(flight.roomSize / 2) + 50;
             flight.scene.add(flight.fixture);
         },
@@ -376,70 +383,78 @@ function createRacewayTorusKnot() {
 }
 
 function eventHandler() {
-    const onKeyDown = function (event) {
+    // const onKeyDown = function (event) {
 
-        switch (event.code) {
+    //     switch (event.code) {
 
-            case 'ArrowUp':
-            case 'KeyW':
-                moveForward = true;
-                break;
+    //         case 'ArrowUp':
+    //         case 'KeyW':
+    //             moveForward = true;
+    //             break;
 
-            case 'ArrowLeft':
-            case 'KeyA':
-                moveLeft = true;
-                break;
+    //         case 'ArrowLeft':
+    //         case 'KeyA':
+    //             moveLeft = true;
+    //             break;
 
-            case 'ArrowDown':
-            case 'KeyS':
-                moveBackward = true;
-                break;
+    //         case 'ArrowDown':
+    //         case 'KeyS':
+    //             moveBackward = true;
+    //             break;
 
-            case 'ArrowRight':
-            case 'KeyD':
-                moveRight = true;
-                break;
+    //         case 'ArrowRight':
+    //         case 'KeyD':
+    //             moveRight = true;
+    //             break;
 
-            case 'Space':
-                if (canJump === true) velocity.y += 350;
-                canJump = false;
-                break;
+    //         case 'Space':
+    //             if (canJump === true) velocity.y += 350;
+    //             canJump = false;
+    //             break;
 
-        }
+    //     }
 
-    };
+    // };
 
-    const onKeyUp = function (event) {
+    // const onKeyUp = function (event) {
 
-        switch (event.code) {
+    //     switch (event.code) {
 
-            case 'ArrowUp':
-            case 'KeyW':
-                moveForward = false;
-                break;
+    //         case 'ArrowUp':
+    //         case 'KeyW':
+    //             moveForward = false;
+    //             break;
 
-            case 'ArrowLeft':
-            case 'KeyA':
-                moveLeft = false;
-                break;
+    //         case 'ArrowLeft':
+    //         case 'KeyA':
+    //             moveLeft = false;
+    //             break;
 
-            case 'ArrowDown':
-            case 'KeyS':
-                moveBackward = false;
-                break;
+    //         case 'ArrowDown':
+    //         case 'KeyS':
+    //             moveBackward = false;
+    //             break;
 
-            case 'ArrowRight':
-            case 'KeyD':
-                moveRight = false;
-                break;
+    //         case 'ArrowRight':
+    //         case 'KeyD':
+    //             moveRight = false;
+    //             break;
 
-        }
+    //     }
 
-    };
+    // };
 
-    document.addEventListener('click', function () {
-        audioLoader();
-    })
+    document.addEventListener('mouseout', function () {
+        flight.controls.autoForward = false;
+        flight.controls.movementSpeed = 0;
+        flight.controls.rollSpeed = 0;
+    });
+
+    document.addEventListener('mouseenter', function () {
+        // flight.controls.autoForward = true;
+        flight.controls.movementSpeed = 60;
+        flight.controls.rollSpeed = 0.65;
+    });
 }
 
 function audioLoader() {
@@ -458,6 +473,7 @@ function audioLoader() {
         'audio/Papers Rustling in the wind.mp3',
         function (audioBuffer) {
             flight.ambientFlightSound.setBuffer(audioBuffer);
+            flight.ambientFlightSound.setLoop(true);
             flight.ambientFlightSound.play();
         },
         function (xhr) {
@@ -484,10 +500,10 @@ function audioLoader() {
     );
 }
 
-function posterCreator(){
+function posterCreator() {
     const loader = new THREE.TextureLoader();
     const scalar = 3;
-    flight.posterFrame = new THREE.BoxGeometry(1, scalar*40, scalar*27);
+    flight.posterFrame = new THREE.BoxGeometry(1, scalar * 40, scalar * 27);
     flight.posterPicture = new THREE.MeshBasicMaterial({
         map: loader.load('texture/airplaneBlock.png'),
         side: THREE.DoubleSide,
@@ -497,4 +513,30 @@ function posterCreator(){
     // flight.posterComposite.position.y = ;
     // flight.posterComposite.position.z = 
     flight.scene.add(flight.posterComposite);
+}
+
+function hoopCreator() {
+    const loader = new THREE.TextureLoader();
+
+    flight.hoop = new THREE.TorusGeometry(3, 1);
+    flight.stripesTexture = new THREE.MeshLambertMaterial({
+        map: loader.load('texture/stripes.png'),
+        color: 0xaa0000,
+    });
+    flight.path = new THREE.Mesh(flight.hoop, flight.stripesTexture);
+    flight.path.position.z = (flight.roomSize / 2) - 75;
+    flight.scene.add(flight.path);
+
+}
+
+function collectibleCreator() {
+    const loader = new THREE.TextureLoader();
+
+    flight.box = new THREE.BoxGeometry(4, 4, 4);
+    flight.boxTexture = new THREE.MeshLambertMaterial({
+        color: 0x0000aa,
+    });
+    flight.lootBox = new THREE.Mesh(flight.box, flight.boxTexture);
+    flight.lootBox.position.z = -1 * ((flight.roomSize / 2) - 75);
+    flight.scene.add(flight.lootBox);
 }
