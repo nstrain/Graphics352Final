@@ -87,10 +87,10 @@ function render() {
 
     // calculate objects intersecting the picking ray
     const intersects = flight.raycaster.intersectObjects(flight.scene.children);
+    flight.controls.movementSpeed = 60;
     // console.log(intersects);
     // console.log(flight.scene.children);
     // console.log(flight.scene.children[0]);
-    flight.controls.movementSpeed = 60;
 
     // for (let i = 0; i < flight.scene.children.length; i++) {
     //     if (flight.scene.children[i].isMesh) {
@@ -100,7 +100,7 @@ function render() {
     let kickStart = true;
     for (let i = 0; i < intersects.length; i++) {
         // intersects[i].object.material.color.set(0xff0000);
-        if (intersects[i].distance < 1) {
+        if (intersects[i].distance < 5) {
 
             flight.controls.movementSpeed = 0;
             console.log("crash");
@@ -177,7 +177,6 @@ function lightingSetUp() {
     // flight.lightingModel.position.set(1, 1, 1);
     flight.lightingModel.position.set(flight.roomSize / 2 - 50, flight.roomSize * (2 / 5), -(flight.roomSize / 2) + 50);
     flight.scene.add(flight.lightingModel);
-
     flight.ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
     flight.scene.add(flight.ambientLight);
 }
