@@ -5,10 +5,10 @@
 import * as THREE from "./js/lib/three.module.js";
 import { FlyControls } from "./js/lib/FlyControls.js"
 import { OBJLoader } from "./js/lib/OBJLoader.js"
+import { AnaglyphEffect } from './js/lib/AnaglyphEffect.js';
 
 import { GLTFLoader } from "./js/lib/GLTFLoader.js"
 
-import { AnaglyphEffect } from './js/lib/AnaglyphEffect.js';
 
 
 $(document).ready(function () { flight.init(); });
@@ -25,8 +25,10 @@ flight.init = function () {
     flight.start = false;
 
     flight.scene = new THREE.Scene();
-    flight.camera = new THREE.PerspectiveCamera(63, window.innerWidth / window.innerHeight, 0.1, 1000);
+    flight.camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
     flight.camera.position.z -= 3;
+
+    flight.camera.focalLength = 3;
 
     flight.camGroup = new THREE.Group();
     loadAirplane();
@@ -38,14 +40,20 @@ flight.init = function () {
     flight.renderer.setSize(window.innerWidth, window.innerHeight);
     document.body.appendChild(flight.renderer.domElement);
 
+    flight.renderer.setPixelRatio( window.devicePixelRatio );
+
+
     //collision
     flight.raycaster = new THREE.Raycaster();
     flight.pointer = new THREE.Vector2();
     flight.pointer.x = 1;
     flight.pointer.y = 1;
 
+    const width = window.innerWidth || 2;
+    const height = window.innerHeight || 2;
+
     flight.effect = new AnaglyphEffect( flight.renderer );
-	flight.effect.setSize( window.innerWidth, window.innerHeight );
+	flight.effect.setSize( width, height );
 
 
     // createRacewayTorus();
@@ -77,7 +85,7 @@ function animate() {
     } else {
         // flight.overlay.add();
     }
-    flight.renderer.render(flight.scene, flight.camera);
+    // flight.renderer.render(flight.scene, flight.camera);
 }
 
 function render() {
