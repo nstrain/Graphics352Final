@@ -504,7 +504,7 @@ function eventHandler() {
     });
 
     document.addEventListener('mouseenter', function () {
-        // flight.controls.autoForward = true;
+        flight.controls.autoForward = true;
         flight.controls.movementSpeed = 60;
         flight.controls.rollSpeed = 0.65;
     });
