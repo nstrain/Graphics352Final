@@ -96,6 +96,8 @@ function render() {
     // console.log(flight.scene.children[0]);
 
     flight.controls.movementSpeed = 60;
+    flight.controls.autoForward = true;
+
 
     // for (let i = 0; i < flight.scene.children.length; i++) {
     //     if (flight.scene.children[i].isMesh) {
@@ -106,7 +108,7 @@ function render() {
     for (let i = 0; i < intersects.length; i++) {
 
         // intersects[i].object.material.color.set(0xff0000);
-        if (intersects[i].distance < 1) {
+        if (intersects[i].distance < 5) {
 
             flight.controls.movementSpeed = 0;
             console.log("crash");
@@ -176,7 +178,7 @@ function controlSetUp() {
     flight.controls = new FlyControls(flight.camGroup, flight.renderer.domElement);
     // Forces the camera/ controls forward, similar to a normal flight sim
     // I will include the movement speed and the roll speed, but set to the default just to show what work is being done
-    // flight.controls.autoForward = true;
+    flight.controls.autoForward = true;
     flight.controls.movementSpeed = 60;
     flight.controls.rollSpeed = 0.65;
     flight.controls.domElement = flight.renderer.domElement;
