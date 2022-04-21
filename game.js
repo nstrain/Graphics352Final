@@ -44,8 +44,8 @@ flight.init = function () {
     flight.pointer.x = 1;
     flight.pointer.y = 1;
 
-    flight.effect = new AnaglyphEffect( flight.renderer );
-	flight.effect.setSize( window.innerWidth, window.innerHeight );
+    flight.effect = new AnaglyphEffect(flight.renderer);
+    flight.effect.setSize(window.innerWidth, window.innerHeight);
 
 
     // createRacewayTorus();
@@ -124,7 +124,12 @@ function render() {
         }
     }
     flight.controls.update(delta);
-    flight.effect.render( flight.scene, flight.camera );
+    // flight.planeStanderd.morphTargetInfluences[0] = (flight.planeStanderd.morphTargetInfluences[0] + 0.01) % 1;
+    // flight.planeStanderd.updateMatrix();
+    // console.log(flight.planeStanderd.morphTargetInfluences);
+    // flight.planeStanderd.updateMorphTargets();
+    flight.mixer.update(delta);
+    flight.effect.render(flight.scene, flight.camera);
 }
 
 function createEnvir() {
@@ -318,30 +323,86 @@ function loadModels() {
         }
     );
 
+    // loader.load('models/WaveCube.glb',
+    //     function (gltf) {
+    //         flight.collectible = gltf.scene.children[ 0 ];
+    //         const scalar = 90;
+    //         flight.mixer = new THREE.AnimationMixer(flight.collectible);
+
+    //         flight.mixer.clipAction(gltf.animations[0]).play();
+    //         flight.collectible.scale.set(scalar, scalar, scalar);
+    //         flight.collectible.position.x = - 50;
+    //         flight.collectible.position.y = ground + 40;
+    //         flight.collectible.position.z = (flight.roomSize / 2) - 30;
+    //         // flight.plant.rotateY(Math.PI);
+    //         flight.scene.add(flight.collectible);
+    //     },
+    //     // called while loading is progressing
+    //     function (xhr) {
+    //         console.log((xhr.loaded / xhr.total * 100) + '% loaded');
+    //     },
+    //     // called when loading has errors
+    //     function (error) {
+    //         console.log('An error happened');
+    //         console.log(error);
+    //     }
+    // );
+
+
 }
 
 function loadAirplane() {
     const loader = new GLTFLoader();
     loader.load(
         // resource URL
-        'models/basePlane.glb',
+        'models/shapePlane.glb',
         // called when the resource is loaded
         function (gltf) {
             // gltf.scene.position.y = 4;
             flight.planeStanderd = gltf.scene;
+            
+            //https://stackoverflow.com/questions/64123783/how-to-update-threejs-morph-targets-from-blender-gltf-shape-keys
+            // flight.planeMaterial = new THREE.MeshStandardMaterial({
+            //     color: 0xffffff,
+            //     emissive: 0xbb5a5a,
+            //     side: THREE.DoubleSide,
+            //     flatShading: true,
+            //     morphTargets: true, // you need this
+            //     needsUpdate: true
+            // });
+            
+            flight.mixer = new THREE.AnimationMixer(flight.planeStanderd);
+            console.log(gltf);
+
+            flight.mixer.clipAction(gltf.animations[0]).play();
+
+
             // flight.planeStanderd.rotateZ(Math.PI/2);
             // flight.planeStanderd.position.x -= 5;
 
             flight.planeStanderd.position.z -= 0.11 + 3;
             flight.planeStanderd.position.y -= 0.01;
-            flight.planeStanderd.rotation.y += Math.PI;
+            // flight.planeStanderd.children[0].rotation.y += Math.PI;
             flight.planeStanderd.rotation.x += Math.PI / 12;
 
             flight.planeStanderd.scale.set(0.05, 0.05, 0.05);
             console.log(flight.planeStanderd);
+            console.log("shape plane");
+
+            // flight.planeStanderd.morphTargetInfluences[0] = 0.75;
+            // flight.planeStanderd.updateMorphTargets();
+            console.log(flight.planeStanderd.morphTargetInfluences);
 
             // flight.scene.add( flight.planeStanderd );
+
+            // flight.planeMaterial.needsUpdate = true;
+            // flight.planeMaterial.morphTargets = true;
+
+            // flight.planeStanderd.material = flight.planeMaterial;
+            //   flight.planeStanderd = new THREE.Mesh(flight.planeStanderdInit, flight.planeMaterial);
+            console.log(flight.planeStanderd);
             flight.camGroup.add(flight.planeStanderd);
+
         },
         // called while loading is progressing
         function (xhr) {
@@ -530,13 +591,14 @@ function hoopCreator() {
 }
 
 function collectibleCreator() {
-    const loader = new THREE.TextureLoader();
+    // const loader = new THREE.TextureLoader();
 
-    flight.box = new THREE.BoxGeometry(4, 4, 4);
-    flight.boxTexture = new THREE.MeshLambertMaterial({
-        color: 0x0000aa,
-    });
-    flight.lootBox = new THREE.Mesh(flight.box, flight.boxTexture);
+    flight.lootBox = new THREE.Mesh(flight.collectible, flight.planeMaterial);
+    // flight.boxTexture = new THREE.MeshLambertMaterial({
+    //     color: 0x0000aa,
+    // });
+    // flight.lootBox = new THREE.Mesh(flight.box, flight.boxTexture);
     flight.lootBox.position.z = -1 * ((flight.roomSize / 2) - 75);
+
     flight.scene.add(flight.lootBox);
 }
